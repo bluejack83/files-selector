@@ -7,50 +7,69 @@ and open the template in the editor.
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
         <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 
-<!-- Optional theme -->
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 
-<!-- Latest compiled and minified JavaScript -->
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
 
-<link rel="stylesheet" href="js/libs/jsTree/themes/default/style.min.css" />
-<script src="js/libs/jsTree/jstree.js"></script>
-        
+        <link rel="stylesheet" href="js/libs/jsTree/themes/default/style.min.css" />
+        <script src="js/libs/jsTree/jstree.js"></script>
+
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
-        <div><a onclick="load()" class="btn btn-success btn-large" ><i class="icon-white icon-folder-open"></i> load</a><a href="save()" class="btn btn-danger btn-large"><i class="icon-white icon-download-alt"></i> download</a></div>
+        <script>
+            var fileData;
+            var save = function() {
+                document.location = window.URL.createObjectURL(new Blob([fileData], {type: 'text/plain'}));
+            }
+        </script>
+        <div><a onclick="load()" class="btn btn-success btn-large" ><i class="icon-white icon-folder-open"></i> load</a><a id="save" class="btn btn-danger btn-large"><i class="icon-white icon-download-alt"></i>save</a><a id="download" class="btn btn-danger btn-large"><i class="icon-white icon-download-alt"></i>download</a></div>
         <div><input id="fileInput" type="file"/><input id="path"/></div>
         <div id="tree"></div>
         <script>
             var input = $("#fileInput");
             input.change(
-            function(eventData){
-                var reader = new FileReader();
+                    function(eventData) {
+                        var reader = new FileReader();
 
-                reader.onload = function(e) {
-                  var fileData = reader.result;
-                  $('#tree').jstree({ 'core' : {
-                        'data' : [
-                            JSON.parse(fileData)
-                        ]
-                    } });
-                };
+                        reader.onload = function(file) {
+                            fileData = reader.result;
+                            $('#tree').jstree({'core': {
+                                    'data': [
+                                        JSON.parse(fileData)
+                                    ]
+                                }});
+                            //$("#save").attr("href",window.URL.createObjectURL(new Blob([fileData], { type: 'text/plain' })));
+                            $("#download").attr("href", "data:application/octet-stream;charset=utf-8;base64," + window.btoa(fileData));
+                            $("#save").attr("onclick", function() {
+                                file.createWriter(function(fileWriter) {
 
-                reader.readAsText(input[0].files[0]);
-            });
-            /*
-            $('#jstree_demo_div').jstree({ 'core' : {
-                'data' : [
-                    {'text': '.', 'children': [{'text': 'a', 'children': [{'text': 'a'}]}, {'text': 'b', 'children': [{'text': 'b'}]}, {'text': '.'}]}
+                                    fileWriter.onwriteend = function(e) {
+                                        console.log('Write completed.');
+                                    };
 
-                ]
-            } });
-            */
+                                    fileWriter.onerror = function(e) {
+                                        console.log('Write failed: ' + e.toString());
+                                    };
+
+                                    // Create a new Blob and write it to log.txt.
+                                    var blob = new Blob(["aa"], {type: 'text/plain'});
+
+                                    fileWriter.write(blob);
+
+
+                                })
+                            });
+                        };
+
+                        reader.readAsText(input[0].files[0]);
+                    });
         </script>
     </body>
 </html>
