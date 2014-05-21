@@ -18,6 +18,10 @@ and open the template in the editor.
 
         <link rel="stylesheet" href="js/libs/jsTree/themes/default/style.min.css" />
         <script src="js/libs/jsTree/jstree.js"></script>
+        <link rel="stylesheet" href="css/default.css">
+
+        <script src="js/libs/downloadify/downloadify.min.js"></script>
+        <script src="js/libs/downloadify/swfobject.js"></script>
 
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -25,14 +29,14 @@ and open the template in the editor.
     <body>
         <script>
             var fileData;
-            var save = function() {
-                document.location = window.URL.createObjectURL(new Blob([fileData], {type: 'text/plain'}));
-            }
         </script>
-        <div><a onclick="load()" class="btn btn-success btn-large" ><i class="icon-white icon-folder-open"></i> load</a><a id="save" class="btn btn-danger btn-large"><i class="icon-white icon-download-alt"></i>save</a><a id="download" class="btn btn-danger btn-large"><i class="icon-white icon-download-alt"></i>download</a></div>
-        <div><input id="fileInput" type="file"/><input id="path"/></div>
+
+        <a id="load" onclick="$('input').click()" class="btn btn-success btn-large"><i class="icon-white icon-folder-open"></i> load</a><a id="download" class="btn btn-danger btn-large"><i class="icon-white icon-download-alt" disabled></i>download</a>
+        <input id="fileInput" type="file"/>
         <div id="tree"></div>
-        <script>
+        <div id="downloadify"></div>
+        
+    <script>
             var input = $("#fileInput");
             input.change(
                     function(eventData) {
@@ -40,36 +44,62 @@ and open the template in the editor.
 
                         reader.onload = function(file) {
                             fileData = reader.result;
-                            $('#tree').jstree({'core': {
+                            $('#tree').jstree({
+                                'core': {
                                     'data': [
                                         JSON.parse(fileData)
-                                    ]
-                                }});
+                                    ],
+                                "plugins" : [ "checkbox","search" ]
+                                }
+                            });
+                            var to = false;
+                            $('#tree_q').keyup(function () {
+                              if(to) { clearTimeout(to); }
+                              to = setTimeout(function () {
+                                var v = $('#plugins4_q').val();
+                                $('#plugins4').jstree(true).search(v);
+                              }, 250);
+                            });
                             //$("#save").attr("href",window.URL.createObjectURL(new Blob([fileData], { type: 'text/plain' })));
-                            $("#download").attr("href", "data:application/octet-stream;charset=utf-8;base64," + window.btoa(fileData));
-                            $("#save").attr("onclick", function() {
-                                file.createWriter(function(fileWriter) {
+                            //$("#download").attr("href", "data:application/octet-stream;charset=utf-8;base64," + window.btoa(fileData));
 
-                                    fileWriter.onwriteend = function(e) {
-                                        console.log('Write completed.');
-                                    };
+                            var json = JSON.stringify(fileData);
+                            var blob = new Blob([json], {type: "application/json"});
+                            var url = URL.createObjectURL(blob);
 
-                                    fileWriter.onerror = function(e) {
-                                        console.log('Write failed: ' + e.toString());
-                                    };
+                            var a = $("#download")[0];
+                            a.download = input.val().split("\\").pop();
+                            a.href = url;
+                            a.textContent = "Download output file";
 
-                                    // Create a new Blob and write it to log.txt.
-                                    var blob = new Blob(["aa"], {type: 'text/plain'});
-
-                                    fileWriter.write(blob);
-
-
-                                })
+                            $("#downloadify").downloadify({
+                                filename: function() {
+                                    return "save";
+                                },
+                                data: function() {
+                                    return fileData;
+                                },
+                                onComplete: function() {
+                                    alert('Your File Has Been Saved!');
+                                },
+                                onCancel: function() {
+                                    alert('You have cancelled the saving of this file.');
+                                },
+                                onError: function() {
+                                    alert('You must put something in the File Contents or there will be nothing to save!');
+                                },
+                                transparent: false,
+                                swf: 'js/libs/downloadify/downloadify.swf',
+                                downloadImage: 'img/transparent.png',
+                                width: $("#save_container").outerWidth(),
+                                height: $("#save_container").outerHeight(),
+                                append: false,
+                                transparent:true,
                             });
                         };
 
                         reader.readAsText(input[0].files[0]);
                     });
-        </script>
-    </body>
+    </script>
+</body>
 </html>

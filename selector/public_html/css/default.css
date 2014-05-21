@@ -1,0 +1,24 @@
+/* 
+    Document   : default
+    Created on : May 20, 2014, 6:49:40 PM
+    Author     : bluejack
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root { 
+    display: block;
+}
+
+input#fileInput {
+    display: none;
+}
+
+downloadify {
+    display:none;
+}
+
+#load, #download {
+    width: 50%;
+}
+
