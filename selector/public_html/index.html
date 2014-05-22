@@ -68,6 +68,10 @@ and open the template in the editor.
         <div id="downloadify"></div>
 
         <script>
+            function getTreeData(){
+                return $.jstree.reference('#tree').get_json('#', { 'flat': false });
+            }
+            
             $("#treeJumbo").hide();
             $("#download").hide();
                 var input = $("#fileInput");
