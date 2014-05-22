@@ -31,75 +31,91 @@ and open the template in the editor.
             var fileData;
         </script>
 
-        <a id="load" onclick="$('input').click()" class="btn btn-success btn-large"><i class="icon-white icon-folder-open"></i> load</a><a id="download" class="btn btn-danger btn-large"><i class="icon-white icon-download-alt" disabled></i>download</a>
+        <a id="load" onclick="$('input').click()" class="btn btn-success btn-large"><i class="icon-white icon-folder-open"></i> load</a><a id="download" class="btn btn-danger btn-large" disabled><i class="icon-white icon-download-alt" disabled></i>download</a>
         <input id="fileInput" type="file"/>
+        <input type="text" id="search" value="" class="input" style="margin:0em auto 1em auto; display:block; padding:4px; border-radius:4px; border:1px solid silver;">
         <div id="tree"></div>
         <div id="downloadify"></div>
-        
-    <script>
-            var input = $("#fileInput");
-            input.change(
-                    function(eventData) {
-                        var reader = new FileReader();
 
-                        reader.onload = function(file) {
-                            fileData = reader.result;
-                            $('#tree').jstree({
-                                'core': {
-                                    'data': [
-                                        JSON.parse(fileData)
-                                    ],
-                                "plugins" : [ "checkbox","search" ]
-                                }
-                            });
-                            var to = false;
-                            $('#tree_q').keyup(function () {
-                              if(to) { clearTimeout(to); }
-                              to = setTimeout(function () {
-                                var v = $('#plugins4_q').val();
-                                $('#plugins4').jstree(true).search(v);
-                              }, 250);
-                            });
-                            //$("#save").attr("href",window.URL.createObjectURL(new Blob([fileData], { type: 'text/plain' })));
-                            //$("#download").attr("href", "data:application/octet-stream;charset=utf-8;base64," + window.btoa(fileData));
+        <script>
+                var input = $("#fileInput");
+                input.change(
+                        function(eventData) {
+                            var reader = new FileReader();
 
-                            var json = JSON.stringify(fileData);
-                            var blob = new Blob([json], {type: "application/json"});
-                            var url = URL.createObjectURL(blob);
+                            reader.onload = function(file) {
+                                fileData = reader.result;
+                                $('#tree').jstree({
+                                    'core': {
+                                        'data': [
+                                            JSON.parse(fileData)
+                                        ],
+                                    },
+                                    "plugins": ["checkbox", "search","sort","wholerow","types"],
+                                    "checkbox": {
+                                        "keep_selected_style": false
+                                    },
+                                    "search":{
+                                        "show_only_matches":true
+                                    },
+                                    types:{
+                                        file:{
+                                            icon:"img/file.png"
+                                        },
+                                        directory:{
+                                            icon:"img/folder.png"
+                                        }
+                                    }
+                                });
+                                var to = false;
+                                $('#search').keyup(function() {
+                                    if (to) {
+                                        clearTimeout(to);
+                                    }
+                                    to = setTimeout(function() {
+                                        var v = $('#search').val();
+                                        $('#tree').jstree(true).search(v);
+                                    }, 250);
+                                });
+                                //$("#save").attr("href",window.URL.createObjectURL(new Blob([fileData], { type: 'text/plain' })));
+                                //$("#download").attr("href", "data:application/octet-stream;charset=utf-8;base64," + window.btoa(fileData));
 
-                            var a = $("#download")[0];
-                            a.download = input.val().split("\\").pop();
-                            a.href = url;
-                            a.textContent = "Download output file";
+                                var json = JSON.stringify(fileData);
+                                var blob = new Blob([json], {type: "application/json"});
+                                var url = URL.createObjectURL(blob);
 
-                            $("#downloadify").downloadify({
-                                filename: function() {
-                                    return "save";
-                                },
-                                data: function() {
-                                    return fileData;
-                                },
-                                onComplete: function() {
-                                    alert('Your File Has Been Saved!');
-                                },
-                                onCancel: function() {
-                                    alert('You have cancelled the saving of this file.');
-                                },
-                                onError: function() {
-                                    alert('You must put something in the File Contents or there will be nothing to save!');
-                                },
-                                transparent: false,
-                                swf: 'js/libs/downloadify/downloadify.swf',
-                                downloadImage: 'img/transparent.png',
-                                width: $("#save_container").outerWidth(),
-                                height: $("#save_container").outerHeight(),
-                                append: false,
-                                transparent:true,
-                            });
-                        };
+                                var a = $("#download")[0];
+                                a.download = input.val().split("\\").pop();
+                                a.href = url;
 
-                        reader.readAsText(input[0].files[0]);
-                    });
-    </script>
-</body>
+                                $("#downloadify").downloadify({
+                                    filename: function() {
+                                        return "save";
+                                    },
+                                    data: function() {
+                                        return fileData;
+                                    },
+                                    onComplete: function() {
+                                        alert('Your File Has Been Saved!');
+                                    },
+                                    onCancel: function() {
+                                        alert('You have cancelled the saving of this file.');
+                                    },
+                                    onError: function() {
+                                        alert('You must put something in the File Contents or there will be nothing to save!');
+                                    },
+                                    transparent: false,
+                                    swf: 'js/libs/downloadify/downloadify.swf',
+                                    downloadImage: 'img/transparent.png',
+                                    width: $("#save_container").outerWidth(),
+                                    height: $("#save_container").outerHeight(),
+                                    append: false,
+                                    transparent:true,
+                                });
+                            };
+
+                            reader.readAsText(input[0].files[0]);
+                        });
+        </script>
+    </body>
 </html>
