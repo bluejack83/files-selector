@@ -9,7 +9,12 @@
 root { 
     display: block;
 }
-
+html,body {height:100%;}
+.fillHeight {height:100%;}
+.bottom { position: absolute; bottom: 0; left: 0; }
+.margin-little {
+    margin: 10px 10px 10px 10px
+}
 input#fileInput {
     display: none;
 }
@@ -18,7 +23,10 @@ downloadify {
     display:none;
 }
 
+#treeJumbo {
+}
+
+
 #load, #download {
-    width: 50%;
 }
 

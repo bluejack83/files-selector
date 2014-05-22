@@ -30,20 +30,58 @@ and open the template in the editor.
         <script>
             var fileData;
         </script>
+        <div class="container">
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div id="loadJumbo" class="jumbotron well">
+				<h1>
+					Welcome
+				</h1>
+				<p>
+					Here you can load your directory structure and chose which files you need. Let's start loading the file.
+				</p>
+				<p>
+                                    <a id="load" onclick="$('input').click()" class="btn btn-success btn-large"><i class="icon-white icon-folder-open"></i> load</a>
+				</p>
+			</div>
+			<div id="treeJumbo" class="jumbotron" disabled>
+				<h1>
+					File selection
+				</h1>
+				<p>
+                                    Now chose the files you need, then click <em>download</em> when you're finished.
+				</p>
+                                <i class="glyphicon glyphicon-search" id=""></i><input type="text" id="search" value="" class="input">
+                                    <div id="tree"></div>
+                                
+			</div>
+                    
+		</div>
+	</div>
+</div>
+        <a id="download" class="margin-little btn btn-danger btn-large bottom"><i class="icon-white icon-download-alt"></i>download</a>
 
-        <a id="load" onclick="$('input').click()" class="btn btn-success btn-large"><i class="icon-white icon-folder-open"></i> load</a><a id="download" class="btn btn-danger btn-large" disabled><i class="icon-white icon-download-alt" disabled></i>download</a>
+        
         <input id="fileInput" type="file"/>
-        <input type="text" id="search" value="" class="input" style="margin:0em auto 1em auto; display:block; padding:4px; border-radius:4px; border:1px solid silver;">
-        <div id="tree"></div>
+        
+        
         <div id="downloadify"></div>
 
         <script>
+            $("#treeJumbo").hide();
+            $("#download").hide();
                 var input = $("#fileInput");
                 input.change(
                         function(eventData) {
                             var reader = new FileReader();
 
                             reader.onload = function(file) {
+                                $("#loadJumbo").hide("slow",function(){
+                                    $("#treeJumbo").show("slow",function(){
+                                        $("#download").show("slow");
+                                    });
+                                });
+                                
                                 fileData = reader.result;
                                 $('#tree').jstree({
                                     'core': {
