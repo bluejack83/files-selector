@@ -59,7 +59,7 @@ and open the template in the editor.
 		</div>
 	</div>
 </div>
-        <a id="download" class="margin-little btn btn-danger btn-large bottom"><i class="icon-white icon-download-alt"></i>download</a>
+        <a id="download" class="margin-little btn btn-danger btn-large bottom" download><i class="icon-white icon-download-alt"></i>download</a>
 
         
         <input id="fileInput" type="file"/>
@@ -68,7 +68,7 @@ and open the template in the editor.
         <div id="downloadify"></div>
 
         <script>
-            function getTreeData(){
+            var getTreeData=function(){
                 return $.jstree.reference('#tree').get_json('#', { 'flat': false });
             }
             
@@ -126,17 +126,19 @@ and open the template in the editor.
                                 var blob = new Blob([json], {type: "application/json"});
                                 var url = URL.createObjectURL(blob);
 
-                                var a = $("#download")[0];
+                                var a = $("#download");
                                 a.download = input.val().split("\\").pop();
                                 a.href = url;
-
+//                                a.click(function(){
+//                                    var json =JSON.stringify(getTreeData());
+//                                    var blob = new Blob([json], {type: "application/json"});
+//                                    window.location= URL.createObjectURL(blob);
+//                                })
                                 $("#downloadify").downloadify({
                                     filename: function() {
                                         return "save";
                                     },
-                                    data: function() {
-                                        return fileData;
-                                    },
+                                    data: getTreeData,
                                     onComplete: function() {
                                         alert('Your File Has Been Saved!');
                                     },
