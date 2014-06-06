@@ -9,12 +9,9 @@ and open the template in the editor.
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 
-        <!-- Optional theme -->
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 
         <!-- Latest compiled and minified JavaScript -->
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-
 
         <link rel="stylesheet" href="js/libs/jsTree/themes/default/style.min.css" />
         <script src="js/libs/jsTree/jstree.js"></script>
@@ -41,7 +38,9 @@ and open the template in the editor.
 					Here you can load your directory structure and chose which files you need. Let's start loading the file.
 				</p>
 				<p>
-                                    <a id="load" onclick="$('input').click()" class="btn btn-success btn-large"><i class="icon-white icon-folder-open"></i> load</a>
+                                    <a id="load" onclick="$('input').click()" class="btn btn-success btn-small">
+                                        <i class="glyphicon-white glyphicon glyphicon-folder-open" style="margin-right: 10px;"></i>load
+                                    </a>
 				</p>
 			</div>
 			<div id="treeJumbo" class="jumbotron" disabled>
@@ -51,7 +50,7 @@ and open the template in the editor.
 				<p>
                                     Now chose the files you need, then click <em>download</em> when you're finished.
 				</p>
-                                <i class="glyphicon glyphicon-search margin-little"></i><input type="text" id="search" value="" class="input">
+                                <i class="glyphicon glyphicon-search margin-little" ></i><input type="text" id="search" value="" class="input">
                                     <div id="tree"></div>
                                 
 			</div>
@@ -59,7 +58,7 @@ and open the template in the editor.
 		</div>
 	</div>
 </div>
-        <a id="download" class="margin-little btn btn-danger btn-large bottom" download><i class="icon-white icon-download-alt"></i>download</a>
+        <a id="download" class="margin-little btn btn-danger btn-large bottom" download><i class="glyphicon-white glyphicon-download-alt" style="margin-right: 10px;"></i>download</a>
 
         
         <input id="fileInput" type="file"/>
