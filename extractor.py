@@ -1,48 +1,41 @@
 import glob
 import os
+import shutil
+	
+def copyDirectory(source,destination,data):
+	if not data["selected"]:
+		return;
 
-def createElement(path):
-	ret = {}
-	ret["text"] = path.split('/')[-2];
-	return ret;
+	for child in data["children"]:
+		sourcePath = os.path.join(source,child["text"])
+		if child["type"]=="directory":
+			destinationDirectory = os.path.join(destination,child["text"]);
+			if not os.path.exists(destinationDirectory):
+				os.makedirs(destinationDirectory)
+			copyDirectory(sourcePath,destinationDirectory,child)
+		if child["type"]=="file":
+			print sourcePath
+			shutil.copy(sourcePath,destination)
+			filesCount++;
 
-def parseFile(file):
-	ret = createElement(file);
-	ret["type"] = "file";
-	return ret;
-	pass
-
-def parseDirectory(directory):
-	ret = createElement(directory);
-	ret["children"] = [];
-	ret["type"] = "directory";
-	try:
-		for element in os.listdir(directory):
-			elementPath = os.path.join(directory, element);
-			
-			if os.path.isfile(elementPath):
-				ret["children"].append(parseFile(elementPath))
-			else:
-				ret["children"].append(parseDirectory(elementPath+"/"))
-			
-	except:
-		pass
-		
-	#print ret;
-	return ret;
-
-def parse(path):
-  if(not os.path.isdir(path)):
-    raise Exception("target is not a directory\n");
-  return parseDirectory(os.path.normpath(path)+"/")
+def copy(source,destination,data):
+	if(not os.path.isdir(destination)):
+		raise Exception("destination is not a directory\n");
+	if(not os.path.isdir(source)):
+		raise Exception("source is not a directory\n");
+	return copyDirectory(os.path.normpath(source),os.path.normpath(destination),data)
 
 import sys
 import json
+from pprint import pprint
+
 try:
-  if(len(sys.argv)<3):
-    raise Exception("usage: extractor [directory-to-parse] [output-file]\n")
-  #with open(sys.argv[2], 'w') as outfile:
-  #  json.dump(parseDirectory(sys.argv[1]), outfile)		
-  print parse(sys.argv[1])
+	if(len(sys.argv)<4):
+		raise Exception("usage: extractor [selection file] [source directory] [destination directory]\n")
+	data = json.load(open(sys.argv[1]))
+	pprint(data)
+	copy(sys.argv[2],sys.argv[3],data)
+	print "Files extracted: "+filesCount;
+  
 except Exception, e:
-  print str(e)
+	print str(e)
