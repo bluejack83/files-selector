@@ -34,7 +34,7 @@ def parseDirectory(directory):
 def parse(path):
   if(not os.path.isdir(path)):
     raise Exception("target is not a directory\n");
-  return parseDirectory(os.path.normpath(path)+"/")
+  return parseDirectory(path)
 
 import sys
 import json
