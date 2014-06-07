@@ -25,7 +25,9 @@ and open the template in the editor.
     </head>
     <body>
         <script>
+            var fileName;
             var fileData;
+            var file;
         </script>
         <div class="container">
 	<div class="row clearfix">
@@ -70,14 +72,51 @@ and open the template in the editor.
             var getTreeData=function(){
                 return $.jstree.reference('#tree').get_json('#', { 'flat': false });
             }
-            
+            function SaveToDisk(fileURL, fileName) {
+                // for non-IE
+                if (!window.ActiveXObject) {
+                    var save = document.createElement('a');
+                    save.href = fileURL;
+                    save.target = '_blank';
+                    save.download = fileName || 'unknown';
+
+                    var event = document.createEvent('Event');
+                    event.initEvent('click', true, true);
+                    save.dispatchEvent(event);
+                    (window.URL || window.webkitURL).revokeObjectURL(save.href);
+                }
+
+                // for IE
+                else if ( !! window.ActiveXObject && document.execCommand)     {
+                    var _window = window.open(fileURL, '_blank');
+                    _window.document.close();
+                    _window.document.execCommand('SaveAs', true, fileName || fileURL)
+                    _window.close();
+                }
+            }
+            function SaveBlobToDisk(blobURL, fileName) {
+                var reader = new FileReader();
+                reader.readAsDataURL(blobURL);
+                reader.onload = function (event) {
+                    var save = document.createElement('a');
+                    save.href = event.target.result;
+                    save.target = '_blank';
+                    save.download = fileName || 'unknown file';
+
+                    var event = document.createEvent('Event');
+                    event.initEvent('click', true, true);
+                    save.dispatchEvent(event);
+                    (window.URL || window.webkitURL).revokeObjectURL(save.href);
+                };
+            }
             $("#treeJumbo").hide();
             $("#download").hide();
                 var input = $("#fileInput");
                 input.change(
                         function(eventData) {
+                        file = input[0].files[0];
+                        fileName = file.name;
                             var reader = new FileReader();
-
                             reader.onload = function(file) {
                                 $("#loadJumbo").hide("slow",function(){
                                     $("#treeJumbo").show("slow",function(){
@@ -126,13 +165,14 @@ and open the template in the editor.
                                 var url = URL.createObjectURL(blob);
 
                                 var a = $("#download");
-                                a.download = input.val().split("\\").pop();
-                                a.href = url;
-//                                a.click(function(){
-//                                    var json =JSON.stringify(getTreeData());
-//                                    var blob = new Blob([json], {type: "application/json"});
-//                                    window.location= URL.createObjectURL(blob);
-//                                })
+//                                a.download = input.val().split("\\").pop();
+//                                a.href = url;
+                                a.click(function(){
+                                    var json =JSON.stringify(getTreeData());
+                                    var blob = new Blob([json], {type: "application/json"});
+                                    SaveBlobToDisk(blob,fileName);
+                                    //window.location= URL.createObjectURL(blob);
+                                })
                                 $("#downloadify").downloadify({
                                     filename: function() {
                                         return "save";
@@ -157,7 +197,7 @@ and open the template in the editor.
                                 });
                             };
 
-                            reader.readAsText(input[0].files[0]);
+                            reader.readAsText(file);
                         });
         </script>
     </body>
