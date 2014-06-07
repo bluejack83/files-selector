@@ -60,7 +60,7 @@ and open the template in the editor.
 		</div>
 	</div>
 </div>
-        <a id="download" class="margin-little btn btn-danger btn-large bottom" download><i class="glyphicon-white glyphicon-download-alt" style="margin-right: 10px;"></i>download</a>
+        <a id="download" class="margin-little btn btn-danger btn-large bottom" download><i class="glyphicon glyphicon-download" style="margin-right: 10px;"></i>download</a>
 
         
         <input id="fileInput" type="file"/>
@@ -70,7 +70,7 @@ and open the template in the editor.
 
         <script>
             var getTreeData=function(){
-                return $.jstree.reference('#tree').get_json('#', { 'flat': false });
+                return $.jstree.reference('#tree').get_json('#', { 'flat': false })[0];
             }
             function SaveToDisk(fileURL, fileName) {
                 // for non-IE

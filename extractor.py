@@ -1,9 +1,13 @@
 import glob
 import os
 import shutil
-	
+from pprint import pprint
+
+filesCount = 0;
+
 def copyDirectory(source,destination,data):
-	if not data["selected"]:
+	pprint(data)
+	if not data["state"]["selected"]:
 		return;
 
 	for child in data["children"]:
@@ -16,7 +20,7 @@ def copyDirectory(source,destination,data):
 		if child["type"]=="file":
 			print sourcePath
 			shutil.copy(sourcePath,destination)
-			filesCount++;
+			filesCount=filesCount+1;
 
 def copy(source,destination,data):
 	if(not os.path.isdir(destination)):
@@ -25,17 +29,24 @@ def copy(source,destination,data):
 		raise Exception("source is not a directory\n");
 	return copyDirectory(os.path.normpath(source),os.path.normpath(destination),data)
 
+#def propagateSelection(node):
+	
+
 import sys
 import json
-from pprint import pprint
+import traceback
 
 try:
 	if(len(sys.argv)<4):
 		raise Exception("usage: extractor [selection file] [source directory] [destination directory]\n")
-	data = json.load(open(sys.argv[1]))
+	with open(sys.argv[1], 'r') as f:
+		data = json.load(f)
+	#data = json.load(open(sys.argv[1]))
 	pprint(data)
 	copy(sys.argv[2],sys.argv[3],data)
-	print "Files extracted: "+filesCount;
+	
+	print "Files extracted: "+str(filesCount);
   
 except Exception, e:
+	traceback.print_exc()
 	print str(e)

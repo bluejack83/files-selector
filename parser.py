@@ -2,8 +2,18 @@ import glob
 import os
 
 def createElement(path):
-	ret = {}
-	ret["text"] = path.split('/')[-2];
+	ret = {
+	  "state"       : {
+		"opened"    : False,  # is the node open
+		"disabled"  : False,  # is the node disabled
+		"selected"  : False  # is the node selected
+	  },
+	  "children"    : [],  # array of strings or objects
+	  "li_attr"     : {},  # attributes for the generated LI node
+	  "a_attr"      : {},  # attributes for the generated A node
+	  "text" :path.split('/')[-1]
+	};
+	#ret["text"] = path.split('/')[-1];
 	return ret;
 
 def parseFile(file):
@@ -23,7 +33,7 @@ def parseDirectory(directory):
 			if os.path.isfile(elementPath):
 				ret["children"].append(parseFile(elementPath))
 			else:
-				ret["children"].append(parseDirectory(elementPath+"/"))
+				ret["children"].append(parseDirectory(elementPath))
 			
 	except:
 		pass
@@ -34,15 +44,15 @@ def parseDirectory(directory):
 def parse(path):
   if(not os.path.isdir(path)):
     raise Exception("target is not a directory\n");
-  return parseDirectory(os.path.normpath(path)+"/")
+  return parseDirectory(os.path.normpath(path))
 
 import sys
 import json
 try:
   if(len(sys.argv)<3):
     raise Exception("usage: extractor [directory to parse] [output file]\n")
-  #with open(sys.argv[2], 'w') as outfile:
-  #  json.dump(parseDirectory(sys.argv[1]), outfile)		
-  print parse(sys.argv[1])
+  with open(sys.argv[2], 'w') as outfile:
+    json.dump(parse(sys.argv[1]), outfile)		
+  #print parse(sys.argv[1])
 except Exception, e:
   print str(e)
