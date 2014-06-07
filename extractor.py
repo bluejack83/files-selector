@@ -3,14 +3,14 @@ import os
 import shutil
 from pprint import pprint
 
+
 filesCount = 0;
 
 def copyDirectory(source,destination,data):
-	pprint(data)
-	if not data["state"]["selected"]:
-		return;
-
+	global filesCount
 	for child in data["children"]:
+		if not child["state"]["selected"]:
+			continue;
 		sourcePath = os.path.join(source,child["text"])
 		if child["type"]=="directory":
 			destinationDirectory = os.path.join(destination,child["text"]);
@@ -29,8 +29,13 @@ def copy(source,destination,data):
 		raise Exception("source is not a directory\n");
 	return copyDirectory(os.path.normpath(source),os.path.normpath(destination),data)
 
-#def propagateSelection(node):
-	
+def propagateSelection(node):
+	selected = node["state"]["selected"];
+	for child in node["children"]:
+		selected = selected or propagateSelection(child);
+	node["state"]["selected"]=selected;
+	#print node["text"]+":"+str(selected);
+	return selected;
 
 import sys
 import json
@@ -42,7 +47,8 @@ try:
 	with open(sys.argv[1], 'r') as f:
 		data = json.load(f)
 	#data = json.load(open(sys.argv[1]))
-	pprint(data)
+	propagateSelection(data)
+	#pprint(data)
 	copy(sys.argv[2],sys.argv[3],data)
 	
 	print "Files extracted: "+str(filesCount);
