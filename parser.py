@@ -11,9 +11,8 @@ def createElement(path):
 	  "children"    : [],  # array of strings or objects
 	  "li_attr"     : {},  # attributes for the generated LI node
 	  "a_attr"      : {},  # attributes for the generated A node
-	  "text" :path.split('/')[-1]
+	  "text":os.path.split(path)[-1]
 	};
-	#ret["text"] = path.split('/')[-1];
 	return ret;
 
 def parseFile(file):
@@ -44,7 +43,7 @@ def parseDirectory(directory):
 def parse(path):
   if(not os.path.isdir(path)):
     raise Exception("target is not a directory\n");
-  return parseDirectory(os.path.normpath(path))
+  return parseDirectory(os.path.normpath(os.path.abspath(path)))
 
 import sys
 import json

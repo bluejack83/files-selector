@@ -22,12 +22,15 @@ def copyDirectory(source,destination,data):
 			shutil.copy(sourcePath,destination)
 			filesCount=filesCount+1;
 
+def normalizePath(path):
+    return os.path.normpath(os.path.abspath(path));
+
 def copy(source,destination,data):
 	if(not os.path.isdir(destination)):
 		raise Exception("destination is not a directory\n");
 	if(not os.path.isdir(source)):
 		raise Exception("source is not a directory\n");
-	return copyDirectory(os.path.normpath(source),os.path.normpath(destination),data)
+	return copyDirectory(normalizePath(source),normalizePath(destination),data)
 
 def propagateSelection(node):
 	selected = node["state"]["selected"];
