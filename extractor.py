@@ -43,15 +43,18 @@ def propagateSelection(node):
 import sys
 import json
 import traceback
+import zlib
+import bz2
 
 try:
 	if(len(sys.argv)<4):
 		raise Exception("usage: extractor [selection file] [source directory] [destination directory]\n")
 	with open(sys.argv[1], 'r') as f:
-		data = json.load(f)
-	#data = json.load(open(sys.argv[1]))
+		data = json.loads(zlib.decompress(f.read()))
+		#data = json.load(f)
+	pprint(data)
 	propagateSelection(data)
-	#pprint(data)
+	
 	copy(sys.argv[2],sys.argv[3],data)
 	
 	print "Files extracted: "+str(filesCount);

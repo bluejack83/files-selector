@@ -1,6 +1,95 @@
 var getTreeData = function() {
     return $.jstree.reference('#tree').get_json('#', {'flat': false})[0];
 }
+function stringToByteArray(str) {
+    var array = new (window.Uint8Array !== void 0 ? Uint8Array : Array)(str.length);
+    var i;
+    var il;
+
+    for (i = 0, il = str.length; i < il; ++i) {
+        array[i] = str.charCodeAt(i) & 0xff;
+    }
+
+    return array;
+}
+//LZW Compression/Decompression for Strings
+var LZW = {
+    compress: function (uncompressed) {
+        "use strict";
+        // Build the dictionary.
+        var i,
+            dictionary = {},
+            c,
+            wc,
+            w = "",
+            result = [],
+            dictSize = 256;
+        for (i = 0; i < 256; i += 1) {
+            dictionary[String.fromCharCode(i)] = i;
+        }
+ 
+        for (i = 0; i < uncompressed.length; i += 1) {
+            c = uncompressed.charAt(i);
+            wc = w + c;
+            //Do not use dictionary[wc] because javascript arrays 
+            //will return values for array['pop'], array['push'] etc
+           // if (dictionary[wc]) {
+            if (dictionary.hasOwnProperty(wc)) {
+                w = wc;
+            } else {
+                result.push(dictionary[w]);
+                // Add wc to the dictionary.
+                dictionary[wc] = dictSize++;
+                w = String(c);
+            }
+        }
+ 
+        // Output the code for w.
+        if (w !== "") {
+            result.push(dictionary[w]);
+        }
+        return result;
+    },
+ 
+ 
+    decompress: function (compressed) {
+        "use strict";
+        // Build the dictionary.
+        var i,
+            dictionary = [],
+            w,
+            result,
+            k,
+            entry = "",
+            dictSize = 256;
+        for (i = 0; i < 256; i += 1) {
+            dictionary[i] = String.fromCharCode(i);
+        }
+ 
+        w = String.fromCharCode(compressed[0]);
+        result = w;
+        for (i = 1; i < compressed.length; i += 1) {
+            k = compressed[i];
+            if (dictionary[k]) {
+                entry = dictionary[k];
+            } else {
+                if (k === dictSize) {
+                    entry = w + w.charAt(0);
+                } else {
+                    return null;
+                }
+            }
+ 
+            result += entry;
+ 
+            // Add w+entry[0] to the dictionary.
+            dictionary[dictSize++] = w + entry.charAt(0);
+ 
+            w = entry;
+        }
+        return result;
+    }
+}
 function SaveToDisk(fileURL, fileName) {
     // for non-IE
     if (!window.ActiveXObject) {
@@ -43,17 +132,30 @@ $("#download").hide();
 var input = $("#fileInput");
 input.change(
         function(eventData) {
-            file = input[0].files[0];
-            fileName = file.name;
-            var reader = new FileReader();
-            reader.onload = function(file) {
-                $("#loadJumbo").hide("slow", function() {
+            $("#loadJumbo").hide("slow", function() {
                     $("#treeJumbo").show("slow", function() {
                         $("#download").show("slow");
                     });
                 });
+            file = input[0].files[0];
+            fileName = file.name;
+            var reader = new FileReader();
+            reader.onload = function(file) {
+                
+                // For Test Purposes
+                fileData = LZW.decompress(JSON.parse(reader.result));
+                
+//                fileData = bzip2.simple(stringToByteArray(reader.result));
+             
+//                fileData = zlibA.inflate(reader.result);
+                
+//                var inflate = new Zlib.Inflate(reader.result);
+//                fileData = inflate.decompress();
+                
+//                var gunzip = new Zlib.Gunzip(reader.result);
+//                fileData = gunzip.decompress();
 
-                fileData = reader.result;
+                //fileData = reader.result;
                 $('#tree').jstree({
                     'core': {
                         'data': [
@@ -78,29 +180,26 @@ input.change(
                 });
                 var to = false;
                 $('#search').keyup(function() {
-                    if (to) {
-                        clearTimeout(to);
+                    if(event.keyCode == 13){
+                        $('#tree').jstree(true).search($('#search').val());
                     }
-                    to = setTimeout(function() {
-                        var v = $('#search').val();
-                        $('#tree').jstree(true).search(v);
-                    }, 250);
+//                    if (to) {
+//                        clearTimeout(to);
+//                    }
+//                    to = setTimeout(function() {
+//                        var v = $('#search').val();
+//                        $('#tree').jstree(true).search(v);
+//                    }, 250);
                 });
                 //$("#save").attr("href",window.URL.createObjectURL(new Blob([fileData], { type: 'text/plain' })));
                 //$("#download").attr("href", "data:application/octet-stream;charset=utf-8;base64," + window.btoa(fileData));
 
-                var json = JSON.stringify(fileData);
-                var blob = new Blob([json], {type: "application/json"});
-                var url = URL.createObjectURL(blob);
 
                 var a = $("#download");
-//                                a.download = input.val().split("\\").pop();
-//                                a.href = url;
                 a.click(function() {
                     var json = JSON.stringify(getTreeData());
                     var blob = new Blob([json], {type: "application/json"});
                     SaveBlobToDisk(blob, fileName);
-                    //window.location= URL.createObjectURL(blob);
                 })
                 $("#downloadify").downloadify({
                     filename: function() {
@@ -125,6 +224,6 @@ input.change(
                     transparent:true,
                 });
             };
-
-            reader.readAsText(file);
+            //reader.readAsArrayBuffer(file);
+            reader.readAsBinaryString(file);
         });
