@@ -1,5 +1,6 @@
 import glob
 import os
+import pprint
 
 def getInt(value):
 	try:
@@ -63,38 +64,41 @@ def decompress(compressed):
  
  
 
-def createElement(path):
+def createElement(path,id):
 	ret = {
-	  "state"       : {
-		"opened"    : False,  # is the node open
-		"disabled"  : False,  # is the node disabled
-		"selected"  : False  # is the node selected
-	  },
 	  "children"    : [],  # array of strings or objects
-	  "li_attr"     : {},  # attributes for the generated LI node
-	  "a_attr"      : {},  # attributes for the generated A node
-	  "text":os.path.split(path)[-1]
+	  "label":os.path.split(path)[-1],
+	  "id":id
 	};
 	return ret;
 
-def parseFile(file):
-	ret = createElement(file);
+def parseFile(file,id):
+	ret = createElement(file,id);
 	ret["type"] = "file";
 	return ret;
 	pass
 
-def parseDirectory(directory):
-	ret = createElement(directory);
+def parseDirectory(directory,id):
+	ret = createElement(directory,id);
 	ret["children"] = [];
-	ret["type"] = "directory";
+	ret["type"] = "folder";
 	try:
+		count = 0;
 		for element in os.listdir(directory):
 			elementPath = os.path.join(directory, element);
+			count = count+1;
 			
+			prefixId=ret["id"];
+			if(prefixId=="0"):
+				prefixId="";
+			childId=prefixId+str(count);
 			if os.path.isfile(elementPath):
-				ret["children"].append(parseFile(elementPath))
+				child = parseFile(elementPath,childId);
 			else:
-				ret["children"].append(parseDirectory(elementPath))
+				child = parseDirectory(elementPath,childId);
+				
+			ret["children"].append(child);
+			
 			
 	except:
 		pass
@@ -105,7 +109,9 @@ def parseDirectory(directory):
 def parse(path):
   if(not os.path.isdir(path)):
     raise Exception("target is not a directory\n");
-  return parseDirectory(os.path.normpath(os.path.abspath(path)))
+  ret = parseDirectory(os.path.normpath(os.path.abspath(path)),"0")
+  print json.dumps(ret);
+  return ret;
 
 import sys
 import json

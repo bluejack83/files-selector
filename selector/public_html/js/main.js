@@ -14,26 +14,26 @@ function stringToByteArray(str) {
 }
 //LZW Compression/Decompression for Strings
 var LZW = {
-    compress: function (uncompressed) {
+    compress: function(uncompressed) {
         "use strict";
         // Build the dictionary.
         var i,
-            dictionary = {},
-            c,
-            wc,
-            w = "",
-            result = [],
-            dictSize = 256;
+                dictionary = {},
+                c,
+                wc,
+                w = "",
+                result = [],
+                dictSize = 256;
         for (i = 0; i < 256; i += 1) {
             dictionary[String.fromCharCode(i)] = i;
         }
- 
+
         for (i = 0; i < uncompressed.length; i += 1) {
             c = uncompressed.charAt(i);
             wc = w + c;
             //Do not use dictionary[wc] because javascript arrays 
             //will return values for array['pop'], array['push'] etc
-           // if (dictionary[wc]) {
+            // if (dictionary[wc]) {
             if (dictionary.hasOwnProperty(wc)) {
                 w = wc;
             } else {
@@ -43,29 +43,27 @@ var LZW = {
                 w = String(c);
             }
         }
- 
+
         // Output the code for w.
         if (w !== "") {
             result.push(dictionary[w]);
         }
         return result;
-    },
- 
- 
-    decompress: function (compressed) {
+   },
+    decompress: function(compressed) {
         "use strict";
         // Build the dictionary.
         var i,
-            dictionary = [],
-            w,
-            result,
-            k,
-            entry = "",
-            dictSize = 256;
+                dictionary = [],
+                w,
+                result,
+                k,
+                entry = "",
+                dictSize = 256;
         for (i = 0; i < 256; i += 1) {
             dictionary[i] = String.fromCharCode(i);
         }
- 
+
         w = String.fromCharCode(compressed[0]);
         result = w;
         for (i = 1; i < compressed.length; i += 1) {
@@ -79,12 +77,12 @@ var LZW = {
                     return null;
                 }
             }
- 
+
             result += entry;
- 
+
             // Add w+entry[0] to the dictionary.
             dictionary[dictSize++] = w + entry.charAt(0);
- 
+
             w = entry;
         }
         return result;
@@ -133,29 +131,87 @@ var input = $("#fileInput");
 input.change(
         function(eventData) {
             $("#loadJumbo").hide("slow", function() {
-                    $("#treeJumbo").show("slow", function() {
-                        $("#download").show("slow");
-                    });
+                $("#treeJumbo").show("slow", function() {
+                    $("#download").show("slow");
                 });
+            });
             file = input[0].files[0];
             fileName = file.name;
             var reader = new FileReader();
             reader.onload = function(file) {
-                
+
                 // For Test Purposes
                 fileData = LZW.decompress(JSON.parse(reader.result));
-                
+
 //                fileData = bzip2.simple(stringToByteArray(reader.result));
-             
+
 //                fileData = zlibA.inflate(reader.result);
-                
+
 //                var inflate = new Zlib.Inflate(reader.result);
 //                fileData = inflate.decompress();
-                
+
 //                var gunzip = new Zlib.Gunzip(reader.result);
 //                fileData = gunzip.decompress();
 
                 //fileData = reader.result;
+                var nodes = {
+                    0: [
+                        {id: 1, label: "My Favorite Sites", type: "folder"},
+                        {id: 2, label: "Empty Folder", type: "folder"},
+                        {id: 3, label: "Direct link to Google", type: "link", url: "http://www.google.com"}
+                    ],
+                    1: [
+                        {id: 11, label: "Tech", type: "folder"},
+                        {id: 12, label: "Food", type: "folder"}
+                    ],
+                    11: [
+                        {id: 111, label: "PHP", type: "folder"},
+                        {id: 112, label: "Javascript", type: "folder"},
+                        {id: 113, label: "Hacker News", type: "link", url: "https://news.ycombinator.com/news"}
+                    ],
+                    12: [
+                        // empty node
+                    ],
+                    111: [
+                        {id: 1111, label: "PHP Engine", type: "folder"},
+                        {id: 1112, label: "PHP Extension", type: "folder"},
+                    ],
+                    112: [
+                        {id: 1121, label: "node.js", type: "link", url: "http://nodejs.org/"}
+                    ],
+                    1111: [
+                        {id: 11111, label: "PHP: Hypertext Preprocessor", type: "link", url: "http://php.net"}
+                    ],
+                    1112: [
+                        {id: 11121, label: "Twig", type: "link", url: "http://twig.sensiolabs.org/"}
+                    ],
+                    2: [
+                        // empty node
+                    ]
+                };
+                nodes = JSON.parse(fileData);
+                $("#columns").hColumns({
+                    searchable: true,
+                    nodeSource: function(node_id, callback) {
+                        if (node_id === null) {
+                            node_id = 0;
+                        }
+
+                        var ret = nodes;
+                        if(node_id!=0)
+                            {
+                                current=nodes.children[node_id[0]-1];
+                                for (var i = 1; i < node_id.length; i++)
+                                {
+                                    current = current.children[(node_id[i]-1)];
+                                }
+                                ret = current;
+                            }
+
+                        return callback(null, ret.children);
+                    }
+                });
+
                 $('#tree').jstree({
                     'core': {
                         'data': [
@@ -180,7 +236,7 @@ input.change(
                 });
                 var to = false;
                 $('#search').keyup(function() {
-                    if(event.keyCode == 13){
+                    if (event.keyCode == 13) {
                         $('#tree').jstree(true).search($('#search').val());
                     }
 //                    if (to) {
