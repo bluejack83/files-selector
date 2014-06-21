@@ -1,5 +1,10 @@
 import glob
 import os
+import sys
+import json
+import traceback
+import zlib
+import bz2
 
 def getInt(value):
 	try:
@@ -10,7 +15,7 @@ def getInt(value):
 
 def compress(uncompressed):
     """Compress a string to a list of output symbols."""
- 
+
     # Build the dictionary.
     dict_size = 256
     dictionary = dict((chr(i), chr(i)) for i in xrange(dict_size))
@@ -65,15 +70,7 @@ def decompress(compressed):
 
 def createElement(path):
 	ret = {
-	  "state"       : {
-		"opened"    : False,  # is the node open
-		"disabled"  : False,  # is the node disabled
-		"selected"  : False  # is the node selected
-	  },
-	  "children"    : [],  # array of strings or objects
-	  "li_attr"     : {},  # attributes for the generated LI node
-	  "a_attr"      : {},  # attributes for the generated A node
-	  "text":os.path.split(path)[-1]
+	  "data":os.path.split(path)[-1]
 	};
 	return ret;
 
@@ -86,7 +83,7 @@ def parseFile(file):
 def parseDirectory(directory):
 	ret = createElement(directory);
 	ret["children"] = [];
-	ret["type"] = "directory";
+	ret["state"] = "closed";
 	try:
 		for element in os.listdir(directory):
 			elementPath = os.path.join(directory, element);
@@ -107,11 +104,8 @@ def parse(path):
     raise Exception("target is not a directory\n");
   return parseDirectory(os.path.normpath(os.path.abspath(path)))
 
-import sys
-import json
-import traceback
-import zlib
-import bz2
+
+
 
 def comptest(s):
     print 'original length:', len(s)

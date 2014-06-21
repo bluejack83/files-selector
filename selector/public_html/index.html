@@ -6,15 +6,21 @@ and open the template in the editor.
 <html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+<!--        <link rel="stylesheet" href="js/libs/jsTree/themes/default/style.min.css" />
+        <script src="js/libs/jsTree/jstree.js"></script>-->
+
+        <!--<script src="js/libs/JsTree.json_data/jquery.jstree.js"></script>-->
+        <!--<script type="text/javascript" src="js/libs/JsTree.json_data/jquery.js"></script>-->
+	<script type="text/javascript" src="js/libs/JsTree.json_data/jquery.cookie.js"></script>
+	<script type="text/javascript" src="js/libs/JsTree.json_data/jquery.hotkeys.js"></script>
+	<script type="text/javascript" src="js/libs/JsTree.json_data/jquery.jstree.js"></script>
+        
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-
-
         <!-- Latest compiled and minified JavaScript -->
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-
-        <link rel="stylesheet" href="js/libs/jsTree/themes/default/style.min.css" />
-        <script src="js/libs/jsTree/jstree.js"></script>
+        
         <script src="js/libs/zlib/zlib_and_gzip.min.js"></script>
         <script src="js/libs/bzip2.js"></script>
 <!--        <script src="js/libs/zlib-browserify/zlib.js"></script>
@@ -33,6 +39,24 @@ and open the template in the editor.
             var fileData;
             var file;
         </script>
+        <div id="tree_demo" class="demo" style="height:100px;">
+	<ul>
+		<li id="phtml_1">
+			<a href="#">Root node 1</a>
+			<ul>
+				<li id="phtml_2">
+					<a href="#">Child node 1</a>
+				</li>
+				<li id="phtml_3">
+					<a href="#">Child node 2</a>
+				</li>
+			</ul>
+		</li>
+		<li id="phtml_4">
+			<a href="#">Root node 2</a>
+		</li>
+	</ul>
+</div>
         <div class="container">
 	<div class="row clearfix">
 		<div class="col-md-12 column">

@@ -156,13 +156,41 @@ input.change(
 //                fileData = gunzip.decompress();
 
                 //fileData = reader.result;
+                $(function () {
+                        $("#tree_demo").jstree({ 
+                                "json_data" : {
+                                        "progressive_render":true,
+                                        "data" : [
+                                                { 
+                                                        "data" : "A node", 
+                                                        "metadata" : { id : 23 },
+                                                        "children" : [ "Child 1", "A Child 2" ]
+                                                },
+                                                { 
+                                                        "attr" : { "id" : "li.node.id1" }, 
+                                                        "data" : { 
+                                                                "title" : "Long format demo", 
+                                                                "attr" : { "href" : "#" } 
+                                                        } 
+                                                }
+                                        ]
+                                },
+                                "plugins" : [ "themes", "json_data", "ui" ]
+                        }).bind("select_node.jstree", function (e, data) { alert(jQuery.data(data.rslt.obj[0], "id")); });
+                });
                 $('#tree').jstree({
-                    'core': {
+                    'json_data': {
+                        "progressive_render":true,
                         'data': [
                             JSON.parse(fileData)
                         ],
                     },
-                    "plugins": ["checkbox", "search", "sort", "wholerow", "types"],
+//                    'json_data': {
+//                        'data': [
+//                            JSON.parse(fileData)
+//                        ],
+//                    }
+                    "plugins": ["themes", "json_data"],
                     "checkbox": {
                         "keep_selected_style": false
                     },
